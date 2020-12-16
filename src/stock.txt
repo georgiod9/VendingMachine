@@ -1,3 +1,9 @@
-1/cheese/10/3
-2/ham/5/1
-3/apple/2/4
+1/cheese/10/3/
+2/ham/10/1/
+3/apple/10/4/
+4/snickers/10/1.5/
+5/hersheys/5/2.5/
+6/juice/10/0.75/
+7/water/10/0.25/
+8/cigarettes/10/4.5/
+9/lighter/10/0.1/
