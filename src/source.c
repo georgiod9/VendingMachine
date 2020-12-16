@@ -10,6 +10,7 @@ const int   RACK_SIZE = 10;
 const int   MAX_SIZE = 20;
 const int   MAX_WORD_SIZE = 20; //20 characters max per word
 const int   PRODUCT_COUNT = 20;
+const int   COLUMN_WIDTH = 30;  //width of table
 
 int PRODUCT_ID[20];
 char* PRODUCT_NAME[20];     //Product list array
@@ -28,7 +29,7 @@ int main(){
     initializeNameArray();
 
     printf("Choose your item: ");
-    char* input = (char*)malloc(sizeof(char)*20);
+    char* input = (char*) malloc(sizeof(char)*20);
     scanf("%s", input);
  
     printf("You chose %s\n", input);
@@ -36,12 +37,76 @@ int main(){
         printf("Error reading database.\n");
     }
 
+    printProductList();
+
     return 0;
 }
 
 void printProductList(){
-    for (int i = 0; i < PRODUCT_COUNT; i++){
+    int charCount = 0;                          //Keep track of character count to adjust column width
+    int temp = 0;                               //temporary variable used to calculate character count
+    for (int i = 0; i < PRODUCT_COUNT; i++){    //this loops around the rows of the database
+        for (int j = 0; j < 4; j++){            //this loops around the columns and prints each cell
+            switch (j)
+            {
+            case 0:                             //Print the product number
+                printf("%i", PRODUCT_ID[i]);
+            
+                temp = PRODUCT_ID[i];           //get product number from pre-populated array of product numbers
+
+                if (temp == 0){                 //in case the id == 0, the char count is 1
+                    charCount = 1;
+                }
+                else {
+                    while(temp > 0){            //calculate digit count
+                    charCount++;                //increment as long as the result of dividing by 10 is less than 0
+                    temp /= 10;                 //keep dividing until number is 0
+                }
+                }
+                
+                break;
+
+            case 1:
+                printf("%s", PRODUCT_NAME[i]);
+                charCount = strlen(PRODUCT_NAME[i]) - 1;    //char count is calculated directly from the char*
+                break;
+
+            case 2:
+                printf("%i", PRODUCT_QUANTITY[i]);
+
+                //same calculation as in case 0
+                temp = PRODUCT_QUANTITY[i]; 
+                while(temp > 0){
+                    charCount++;
+                    temp /= 10;
+                }
+                break;
+
+            case 3:
+                printf("%i", PRODUCT_PRICE[i]);
+
+                //same calculationas is case 2
+                temp = PRODUCT_PRICE[i];
+                while(temp > 0){
+                    charCount++;
+                    temp /= 10;
+                }
+                break;
+            
+            default:
+                break;
+            }
+
+            //Print spaces while adjusting column width to 30 characters wide
+            
+            for (int k = 0; k < COLUMN_WIDTH - charCount; k++){
+                printf(" ");
+            }
+            charCount = 0;      //reset char count when searching for next word
+        }
         
+        //new line at the end of each row
+        printf("\n");
     }
 }
 
@@ -57,7 +122,7 @@ int parseDatabase(){
     int charCount = 0;                  //Keep track of the character count in a word
     int rowCount = 0;                   //Keep track of entry count, each row is a product
     int colCount = 0;                   //Keep track of which column we are reading from DB
-    char buffer[15];                    //Buffer to read words
+    char buffer[30];                    //Buffer to read words
     strcpy(buffer, "");                 //Initialize buffer
 
     //Loop through DB file lines
@@ -78,26 +143,28 @@ int parseDatabase(){
             {
             case 0: //col1 -> product ID
                 PRODUCT_ID[rowCount] = rowCount;
-                printf("%i", PRODUCT_ID[rowCount]);
+                //printf("%i", PRODUCT_ID[rowCount]);
                 break;
 
             case 1: //col2 -> product Name
-                strcpy(PRODUCT_NAME[rowCount], buffer);         //Copy product name from buffer to corresponding row
-                                                                //each row corresponds to an element of the PRODUCT_NAME array
-                                                                //such that each row of the table represents a product
-                printf("%s", PRODUCT_NAME[rowCount]);
+                //Copy product name from buffer to corresponding row
+                //each row corresponds to an element of the PRODUCT_NAME array
+                //such that each row of the table represents a product
+                strcpy(PRODUCT_NAME[rowCount], buffer);         
+                //printf("%s", PRODUCT_NAME[rowCount]);
                 break;
 
             case 2: //col3 -> Product Quantity
-                PRODUCT_QUANTITY[rowCount] = atoi(buffer);      //convert buffer value to int
-                                                                //here, value in buffer is the string value of the quantity of the product
-                                                                //so we are converting a string of numbers into an integer 
-                printf("%i", PRODUCT_QUANTITY[rowCount]);
+                //convert buffer value to int
+                //here, value in buffer is the string value of the quantity of the product
+                //so we are converting a string of numbers into an integer
+                PRODUCT_QUANTITY[rowCount] = atoi(buffer);       
+                //printf("%i", PRODUCT_QUANTITY[rowCount]);
                 break;
 
             case 3: //col4 -> Product Price
                 PRODUCT_PRICE[rowCount] = atoi(buffer);
-                printf("%s", buffer);
+                //printf("%s", buffer);
                 break;
             
             default:
@@ -106,7 +173,7 @@ int parseDatabase(){
 
             //Create even horizontal spacing between columns
             for (int i = 0; i < 20 - charCount; i++){
-                printf(" ");
+                //printf(" ");
             }
 
             colCount++;
@@ -115,7 +182,7 @@ int parseDatabase(){
         }
 
         if (charRead == '\n'){
-            printf("\n");
+            //printf("\n");
             charCount = 0;
             rowCount++;
             colCount = 0;
