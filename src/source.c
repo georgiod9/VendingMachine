@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 //Stock file - database path
 const char* DB_PATH = "C:\\Users\\Geo\\Desktop\\Vending Machine C program\\src\\stock.txt";
@@ -25,20 +26,23 @@ void printProductList();
 
 int main(){
 
+    //Setup
     //Allocate memory to product list array
     initializeNameArray();
+
+    if (parseDatabase()){
+        printf("Error reading database.\n");
+    }
+
+    //printProductList();
 
     printf("Choose your item: ");
     char* input = (char*) malloc(sizeof(char)*20);
     scanf("%s", input);
  
     printf("You chose %s\n", input);
-    if (parseDatabase()){
-        printf("Error reading database.\n");
-    }
-
-    printProductList();
-
+    
+    
     return 0;
 }
 
@@ -50,18 +54,21 @@ void printProductList(){
             switch (j)
             {
             case 0:                             //Print the product number
-                printf("%i", PRODUCT_ID[i]);
+                printf("%i", PRODUCT_ID[i] + 1);
             
                 temp = PRODUCT_ID[i];           //get product number from pre-populated array of product numbers
 
                 if (temp == 0){                 //in case the id == 0, the char count is 1
                     charCount = 1;
                 }
+                else if (temp == 9){            // 10/10 gives 0, so take that into account
+                    charCount = 2;
+                }
                 else {
                     while(temp > 0){            //calculate digit count
                     charCount++;                //increment as long as the result of dividing by 10 is less than 0
                     temp /= 10;                 //keep dividing until number is 0
-                }
+                    }
                 }
                 
                 break;
@@ -104,7 +111,7 @@ void printProductList(){
             }
             charCount = 0;      //reset char count when searching for next word
         }
-        
+
         //new line at the end of each row
         printf("\n");
     }
@@ -163,17 +170,36 @@ int parseDatabase(){
                 break;
 
             case 3: //col4 -> Product Price
+                //if ()
                 PRODUCT_PRICE[rowCount] = atoi(buffer);
-                //printf("%s", buffer);
+                printf("%s \n", buffer);
+                int length = strlen(buffer);
+                int iteration = 0;
+                char hundreds[3];
+                char decimal[2];
+                bool hundred = true;
+                int hund_int;
+                int dec_int;
+
+                for (int i = 0; i < length; i++){
+                    if (buffer[i] != '.' && hundred) {
+                        strcat(hundreds, &buffer[i]);
+                    }
+                    else {
+                        hundred = false;
+                        hund_int = atoi(hundreds);
+                        
+                    }
+        
+                    if (!hundred){
+
+                    }
+                    
+                }
                 break;
             
             default:
                 break;
-            }
-
-            //Create even horizontal spacing between columns
-            for (int i = 0; i < 20 - charCount; i++){
-                //printf(" ");
             }
 
             colCount++;
@@ -182,7 +208,6 @@ int parseDatabase(){
         }
 
         if (charRead == '\n'){
-            //printf("\n");
             charCount = 0;
             rowCount++;
             colCount = 0;

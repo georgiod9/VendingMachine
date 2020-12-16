@@ -17,4 +17,4 @@
 17/KitKat/10/0.5/
 18/Maltesers/10/0.5/
 19/Jelly Beans/10/0.3/
-20/Tequila Shot/10/2/
+20/Tequila Shot/10/./
