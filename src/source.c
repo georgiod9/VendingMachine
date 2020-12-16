@@ -3,7 +3,7 @@
 #include <string.h>
 
 //Stock file - database path
-const char* DB_PATH = "C:\\Users\\Geo\\Desktop\\Vending Machine C program\\stock.txt";
+const char* DB_PATH = "C:\\Users\\Geo\\Desktop\\Vending Machine C program\\src\\stock.txt";
 const char* SECRET_KEY = "admin";
 const char* TABLE_HEADER = "Product Number     Name       Quantity      Price";
 
@@ -67,7 +67,7 @@ int addProduct(int productID, char *productName, int productQuantity, double pro
         return 1;
     }
 
-    fseek(fileWrite, 5, SEEK_CUR);
+    fseek(fileWrite, 2, SEEK_SET);
     fprintf(fileWrite, "%s", "          ");
     fclose(fileWrite);
     return 0;
