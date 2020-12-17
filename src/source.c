@@ -23,6 +23,7 @@ int addProduct(int productID, char *productName, int productQuantity, double pro
 void initializeNameArray();
 void fillArrays();
 void printProductList();
+int writeDatabase();
 
 int main(){
 
@@ -33,7 +34,12 @@ int main(){
     if (parseDatabase()){
         printf("Error reading database.\n");
     }
+    PRODUCT_QUANTITY[9] = 10;
+    PRODUCT_PRICE[9] = 0.85;
 
+    if (writeDatabase()){
+        printf("Something went wrong.\n");
+    }
     printProductList();
 
     printf("Choose your item: ");
@@ -115,6 +121,41 @@ void printProductList(){
         //new line at the end of each row
         printf("\n");
     }
+}
+
+int writeDatabase(){
+
+    FILE *fileWrite = fopen(DB_PATH, "w");
+    if (fileWrite == NULL){
+        return 1;
+    }
+    for (int i = 0; i < 20; i++){
+        for (int j = 0; j < 4; j++){
+            switch (j)
+            {
+            case 0:
+                fprintf(fileWrite, "%d/", PRODUCT_ID[i]);
+                break;
+
+            case 1:
+                fprintf(fileWrite, "%s/", PRODUCT_NAME[i]);
+                break;
+
+            case 2:
+                fprintf(fileWrite, "%d/", PRODUCT_QUANTITY[i]);
+                break;
+
+            case 3:
+                if (i < 19) fprintf(fileWrite, "%.2lf/\n", PRODUCT_PRICE[i]);
+                else fprintf(fileWrite, "%.2lf/", PRODUCT_PRICE[i]);
+                break;
+            
+            default:
+                break;
+            }
+        }
+    }
+    fclose(fileWrite);
 }
 
 int parseDatabase(){
