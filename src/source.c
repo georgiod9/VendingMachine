@@ -16,7 +16,7 @@ const int   COLUMN_WIDTH = 30;  //width of table
 int PRODUCT_ID[20];
 char* PRODUCT_NAME[20];     //Product list array
 int PRODUCT_QUANTITY[20];
-int PRODUCT_PRICE[20];
+double PRODUCT_PRICE[20];
 
 int parseDatabase();
 int addProduct(int productID, char *productName, int productQuantity, double productPrice);
@@ -34,7 +34,7 @@ int main(){
         printf("Error reading database.\n");
     }
 
-    //printProductList();
+    printProductList();
 
     printf("Choose your item: ");
     char* input = (char*) malloc(sizeof(char)*20);
@@ -90,9 +90,9 @@ void printProductList(){
                 break;
 
             case 3:
-                printf("%i", PRODUCT_PRICE[i]);
+                printf("%.2lf", PRODUCT_PRICE[i]);  //.2 lf --> .2 sets precision to 2 decimal places and lf is for long float/double type
 
-                //same calculationas is case 2
+                //same calculations is case 2
                 temp = PRODUCT_PRICE[i];
                 while(temp > 0){
                     charCount++;
@@ -170,32 +170,7 @@ int parseDatabase(){
                 break;
 
             case 3: //col4 -> Product Price
-                //if ()
-                PRODUCT_PRICE[rowCount] = atoi(buffer);
-                printf("%s \n", buffer);
-                int length = strlen(buffer);
-                int iteration = 0;
-                char hundreds[3];
-                char decimal[2];
-                bool hundred = true;
-                int hund_int;
-                int dec_int;
-
-                for (int i = 0; i < length; i++){
-                    if (buffer[i] != '.' && hundred) {
-                        strcat(hundreds, &buffer[i]);
-                    }
-                    else {
-                        hundred = false;
-                        hund_int = atoi(hundreds);
-                        
-                    }
-        
-                    if (!hundred){
-
-                    }
-                    
-                }
+                PRODUCT_PRICE[rowCount] = (double) atof(buffer);
                 break;
             
             default:
