@@ -27,6 +27,8 @@ void fillArrays();
 void printProductList();
 int updateDatabase();
 bool startTransaction(int quantity, int choice, double productPrice, bool purchaseSuccessful);
+void reloadQuantity();
+void setPrice();
 
 int main(){
 
@@ -59,125 +61,186 @@ int main(){
     bool retry = false;
     bool purchaseSuccessful = false;
     bool doTransaction = false;
+    bool enableAdmin = false;
 
     while(true){
         //prompt user
         do {
             
-            //Only ask if user is not ordering
-            if (!orderInProgress){
-                system("cls");
-                printProductList();
+            if (!enableAdmin){
+                //Only ask if user is not ordering
+                if (!orderInProgress){
+                    system("cls");
+                    printProductList();
 
-                printf("Choose your item: ");
-                scanf("%s", input);
+                    printf("Choose your item: ");
+                    scanf("%s", input);
 
-                //IMPLEMENT
-                if (strcmp(input, "admin") == 0){
-                    printf("ADMIN MODE\n");
-                    Sleep(1000);
-                    
-                    break;
-                }
-                else{
-                    choice = atoi(input);
-                    choice--;   //take into account that list numbering starts at 1 on user interface
-                    orderInProgress = true;
-                }
-                
-            }
-            
-            if (choice >= 0 && choice < PRODUCT_COUNT){
+                    //IMPLEMENT
+                    if (strcmp(input, "admin") == 0){
+                        system("cls");
+                        Sleep(200);
 
-                //Get data from arrays into variables
-                productID = PRODUCT_ID[choice];
-                productName = PRODUCT_NAME[choice];
-                productPrice = PRODUCT_PRICE[choice];
-                productQuantity = PRODUCT_QUANTITY[choice];
+                        while(strcmp(input, "quit") != 0){
 
-                //temporary variable to store user's required quantity
-                int quantity;                                   
-                
-                //Proceed with the trade if the product is in stock
-                if (productQuantity > 0){
+                            printf("**********************************************\n");
+                            printf("******************ADMIN MODE******************\n");
+                            printf("**********************************************\n\n");
+                            Sleep(200);
+                            printf("++++++++++++++ Select an option ++++++++++++++\n\n");
+                            Sleep(200);
+                            printf("1. Reload a product's stock count.\n");
+                            Sleep(200);
+                            printf("2. Modify a product's price.\n");
+                            Sleep(200);
+                            printf("3. Add a product to stock list.\n");
+                            Sleep(200);
+                            printf("4. Delete a product from stock list.\n");
+                            Sleep(200);
+                            printf("5. Clear all products' quantities in stock.\n");
+                            Sleep(1000);
+                            printf("Choice: ");
 
-                    //Ask the user only if a new session has started
-                    //retry is true when the user later inputs invalid data
-                    if (!retry){
-                        printf("You chose %s\n", productName);
-                        printf("Enter quantity: ");
-                        scanf("%i", &quantity);
+                            int option;
+                            scanf("%i", &option);
+                            switch (option)
+                            {
+                                case 1:
+                                    reloadQuantity();
+                                    updateDatabase();
+                                    break;
+                                
+                                case 2:
+                                    setPrice();
+                                    updateDatabase();
+                                    break;
+
+                                case 3:
+                                    
+                                    break;
+
+                                case 4:
+                                    
+                                    break;
+
+                                case 5:
+                                    
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
+                            enableAdmin = true;
+                            system("cls");
+                            }
+                        
+                        //break;
+                    }
+                    else{
+                        choice = atoi(input);
+                        choice--;   //take into account that list numbering starts at 1 on user interface
+                        orderInProgress = true;
                     }
                     
-                    //when user asks for more than the quantity in stock,
-                    //offer the maximum available amount of this product
-                    if (productQuantity < quantity && !doTransaction){
-                        printf("Sorry, not enough in stock. Do you want to take ");
-                        printf("%i of %s instead? (type: yes/no) ", productQuantity, productName);
+                }
+                
+                if (choice >= 0 && choice < PRODUCT_COUNT){
 
-                        char* answer = (char*) malloc(sizeof(char) * 10);
-                        scanf("%s", answer);
+                    //Get data from arrays into variables
+                    productID = PRODUCT_ID[choice];
+                    productName = PRODUCT_NAME[choice];
+                    productPrice = PRODUCT_PRICE[choice];
+                    productQuantity = PRODUCT_QUANTITY[choice];
 
-                        //If user answers with yes
-                        if (strcmp(answer, "yes") == 0 || strcmp(answer, "Yes") == 0 || strcmp(answer, "YES") == 0){
-                            quantity = productQuantity;
-                            doTransaction = true;
+                    //temporary variable to store user's required quantity
+                    int quantity;                                   
+                    
+                    //Proceed with the trade if the product is in stock
+                    if (productQuantity > 0){
+
+                        //Ask the user only if a new session has started
+                        //retry is true when the user later inputs invalid data
+                        if (!retry){
+                            printf("You chose %s\n", productName);
+                            printf("Enter quantity: ");
+                            scanf("%i", &quantity);
                         }
-                        //If user answers with no
-                        else if(strcmp(answer, "no") == 0 || strcmp(answer, "No") == 0){
-                            orderInProgress = false;
+                        
+                        //when user asks for more than the quantity in stock,
+                        //offer the maximum available amount of this product
+                        if (productQuantity < quantity && !doTransaction){
+                            printf("Sorry, not enough in stock. Do you want to take ");
+                            printf("%i of %s instead? (type: yes/no) ", productQuantity, productName);
+
+                            char* answer = (char*) malloc(sizeof(char) * 10);
+                            scanf("%s", answer);
+
+                            //If user answers with yes
+                            if (strcmp(answer, "yes") == 0 || strcmp(answer, "Yes") == 0 || strcmp(answer, "YES") == 0){
+                                quantity = productQuantity;
+                                doTransaction = true;
+                            }
+                            //If user answers with no
+                            else if(strcmp(answer, "no") == 0 || strcmp(answer, "No") == 0){
+                                orderInProgress = false;
+                            }
+                            else {
+                                printf("Invalid answer.\n");
+                                retry = true;               //raise the retry flag to force user to retry answering
+                            }
+                            free(answer);                   //free the memory allocated for answer
                         }
                         else {
-                            printf("Invalid answer.\n");
-                            retry = true;               //raise the retry flag to force user to retry answering
+                            doTransaction = true;           //Allow for initiating the transaction
                         }
-                        free(answer);                   //free the memory allocated for answer
+                        
+                        if (doTransaction){
+
+                            //Perform the transaction
+                            //function returns true if the transaction is successful
+                            purchaseSuccessful = startTransaction(quantity, choice, productPrice, purchaseSuccessful);
+                            if (purchaseSuccessful){
+                                doTransaction = false;
+                                retry = false;
+                            }
+                        }
                     }
-                    else {
-                        doTransaction = true;           //Allow for initiating the transaction
+                    else{
+                        printf("%s is out of stock. Returning to main menu.\n", productName);
+                        orderInProgress = false;
+                        retry = false;
+                        Sleep(3000);
                     }
                     
-                    if (doTransaction){
-
-                        //Perform the transaction
-                        //function returns true if the transaction is successful
-                        purchaseSuccessful = startTransaction(quantity, choice, productPrice, purchaseSuccessful);
-                        if (purchaseSuccessful){
-                            doTransaction = false;
-                            retry = false;
-                        }
-                    }
                 }
-                else{
-                    printf("%s is out of stock. Returning to main menu.\n", productName);
+                else {
+                    //Invalid product ID is entered
+                    printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
                     orderInProgress = false;
                     retry = false;
                     Sleep(3000);
                 }
-                
+
+                //Print info message upon successful transaction
+                if (purchaseSuccessful){
+
+                    printf("\n*************************************************************\n");
+                    printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
+                    printf("Thank you for using SmartVendo 3000!\n");
+                    printf("Returning to main menu.\n");
+
+                    //Update the stock file
+                    updateDatabase();
+                    Sleep(10000);
+                    orderInProgress = false;            //Stop the current sale session
+                    
+                }
             }
+            //Admin Mode
             else {
-                //Invalid product ID is entered
-                printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
-                orderInProgress = false;
-                retry = false;
-                Sleep(3000);
-            }
-
-            //Print info message upon successful transaction
-            if (purchaseSuccessful){
-
-                printf("\n*************************************************************\n");
-                printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
-                printf("Thank you for using SmartVendo 3000!\n");
-                printf("Returning to main menu.\n");
-
-                //Update the stock file
-                updateDatabase();
-                Sleep(10000);
-                orderInProgress = false;            //Stop the current sale session
                 
             }
+            
         }
         while(strcmp(input, "admin") != 0);
 
@@ -188,6 +251,40 @@ int main(){
     
     
     return 0;
+}
+
+void setPrice(){
+    int ID;
+    printf("Enter product ID of item you want to modify: ");
+    scanf("%i", &ID);
+
+    double newPrice = -1;
+
+    while(newPrice <= 0){
+        printf("Enter new price for %s: ", PRODUCT_NAME[ID]);
+        scanf("%lf", &newPrice);
+
+        if (newPrice <= 0){
+            printf("Enter a number greater than zero.\n");
+        }
+    }
+
+    PRODUCT_PRICE[ID] = newPrice;
+}
+
+//Set new quantity to any product
+void reloadQuantity(){
+    printf("Enter product ID of item you want to modify: ");
+                                
+    int ID;
+    scanf("%i", &ID);
+    printf("Enter new quantity for %s: \n", PRODUCT_NAME[ID]);
+    
+    int Q;
+    scanf("%i", &Q);
+    printf("%s new quantity set to %i\n", PRODUCT_NAME[ID], Q);
+
+    PRODUCT_QUANTITY[ID] = Q;
 }
 
 //Call this function when the user should pay
