@@ -29,6 +29,8 @@ int updateDatabase();
 bool startTransaction(int quantity, int choice, double productPrice, bool purchaseSuccessful);
 void reloadQuantity();
 void setPrice();
+void clearAllQuantities();
+void setAllQuantities();
 
 int main(){
 
@@ -62,6 +64,7 @@ int main(){
     bool purchaseSuccessful = false;
     bool doTransaction = false;
     bool enableAdmin = false;
+    bool validateInput = false;
 
     while(true){
         //prompt user
@@ -80,8 +83,9 @@ int main(){
                     if (strcmp(input, "admin") == 0){
                         system("cls");
                         Sleep(200);
+                        enableAdmin = true;
 
-                        while(strcmp(input, "quit") != 0){
+                        while(enableAdmin){
 
                             printf("**********************************************\n");
                             printf("******************ADMIN MODE******************\n");
@@ -98,45 +102,68 @@ int main(){
                             printf("4. Delete a product from stock list.\n");
                             Sleep(200);
                             printf("5. Clear all products' quantities in stock.\n");
-                            Sleep(1000);
+                            Sleep(200);
+                            printf("6. Set all products' quantities in stock.\n");
+                            Sleep(200);
                             printf("Choice: ");
 
                             int option;
-                            scanf("%i", &option);
-                            switch (option)
-                            {
-                                case 1:
-                                    reloadQuantity();
-                                    updateDatabase();
-                                    break;
-                                
-                                case 2:
-                                    setPrice();
-                                    updateDatabase();
-                                    break;
+                            char input_choice[4];
 
-                                case 3:
-                                    
-                                    break;
-
-                                case 4:
-                                    
-                                    break;
-
-                                case 5:
-                                    
-                                    break;
-                                    
-                                default:
+                            scanf("%s", &input_choice);
+                            if (strcmp(input_choice, "quit") == 0 || strcmp(input_choice, "QUIT") == 0
+                                || strcmp(input_choice, "Quit") == 0){
+                                    printf("Quitting Administrator Mode...\n");
+                                    Sleep(1000);
+                                    strcpy(input, input_choice);
+                                    validateInput = true;
+                                    enableAdmin = false;
                                     break;
                             }
-                            enableAdmin = true;
+                            else {
+                                option = atoi(input_choice);
+                                if (option > 0 && option <= 6){
+                                    switch (option)
+                                    {
+                                        case 1:
+                                            reloadQuantity();
+                                            updateDatabase();
+                                            break;
+                                        
+                                        case 2:
+                                            setPrice();
+                                            updateDatabase();
+                                            break;
+
+                                        case 3:
+                                            
+                                            break;
+
+                                        case 4:
+                                            
+                                            break;
+
+                                        case 5:
+                                            clearAllQuantities();
+                                            updateDatabase();
+                                            break;
+                                            
+                                        case 6:
+                                            setAllQuantities();
+                                            updateDatabase();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                           
                             system("cls");
                             }
                         
                         //break;
                     }
-                    else{
+                    else {
                         choice = atoi(input);
                         choice--;   //take into account that list numbering starts at 1 on user interface
                         orderInProgress = true;
@@ -214,17 +241,20 @@ int main(){
                     
                 }
                 else {
-                    //Invalid product ID is entered
-                    printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
-                    orderInProgress = false;
-                    retry = false;
-                    Sleep(3000);
+                    if (!validateInput){
+                        //Invalid product ID is entered
+                        printf("%s\n", input);
+                        printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
+                        orderInProgress = false;
+                        retry = false;
+                        Sleep(3000);
+                    }
                 }
 
                 //Print info message upon successful transaction
                 if (purchaseSuccessful){
 
-                    printf("\n*************************************************************\n");
+                    printf("\n*************************************************************\n\n");
                     printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
                     printf("Thank you for using SmartVendo 3000!\n");
                     printf("Returning to main menu.\n");
@@ -236,23 +266,40 @@ int main(){
                     
                 }
             }
-            //Admin Mode
-            else {
-                
-            }
             
         }
-        while(strcmp(input, "admin") != 0);
-
-        //Secret key is entered, entering administrator mode{
-        Sleep(400);
-        system("cls");
+        while(true);
     }
-    
     
     return 0;
 }
 
+//Set all quantities to value chosen by admin
+void setAllQuantities(){
+
+    //prompt user
+    int quantity;
+    printf("Enter quantity to set for all products: ");
+    scanf("%i", &quantity);
+
+    //validate input
+    if (quantity >= 0){
+
+        //Set all quantities one by one
+        for (int i = 0; i < PRODUCT_COUNT; i++){
+            PRODUCT_QUANTITY[i] = quantity;
+        }   
+    }
+}
+
+//Reset all quantities to 0
+void clearAllQuantities(){
+    for (int i = 0; i < PRODUCT_COUNT; i++){
+        PRODUCT_QUANTITY[i] = 0;
+    }
+}
+
+//Set price of a specific product
 void setPrice(){
     int ID;
     printf("Enter product ID of item you want to modify: ");
@@ -278,11 +325,11 @@ void reloadQuantity(){
                                 
     int ID;
     scanf("%i", &ID);
-    printf("Enter new quantity for %s: \n", PRODUCT_NAME[ID]);
+    printf("Enter new quantity for %s: ", PRODUCT_NAME[ID]);
     
     int Q;
     scanf("%i", &Q);
-    printf("%s new quantity set to %i\n", PRODUCT_NAME[ID], Q);
+    printf("%s new quantity set to %i.\n", PRODUCT_NAME[ID], Q);
 
     PRODUCT_QUANTITY[ID] = Q;
 }
