@@ -20,6 +20,8 @@ char* PRODUCT_NAME[20];     //Product list array
 int PRODUCT_QUANTITY[20];
 double PRODUCT_PRICE[20];
 
+bool validateInput = false;
+
 int parseDatabase();
 int addProduct(int productID, char *productName, int productQuantity, double productPrice);
 void initializeNameArray();
@@ -31,6 +33,7 @@ void reloadQuantity();
 void setPrice();
 void clearAllQuantities();
 void setAllQuantities();
+bool adminInterface(char* input, bool adminMode);
 
 int main(){
 
@@ -64,214 +67,215 @@ int main(){
     bool purchaseSuccessful = false;
     bool doTransaction = false;
     bool enableAdmin = false;
-    bool validateInput = false;
+    
 
-    while(true){
-        //prompt user
-        do {
-            
-            if (!enableAdmin){
-                //Only ask if user is not ordering
-                if (!orderInProgress){
+    //prompt user
+    do {
+        
+        if (!enableAdmin){
+            //Only ask if user is not ordering
+            if (!orderInProgress){
+                system("cls");
+                printProductList();
+
+                printf("Choose your item: ");
+                scanf("%s", input);
+
+                //IMPLEMENT
+                if (strcmp(input, "admin") == 0){
                     system("cls");
-                    printProductList();
+                    Sleep(200);
+                    enableAdmin = true;
 
-                    printf("Choose your item: ");
-                    scanf("%s", input);
-
-                    //IMPLEMENT
-                    if (strcmp(input, "admin") == 0){
-                        system("cls");
-                        Sleep(200);
-                        enableAdmin = true;
-
-                        while(enableAdmin){
-
-                            printf("**********************************************\n");
-                            printf("******************ADMIN MODE******************\n");
-                            printf("**********************************************\n\n");
-                            Sleep(200);
-                            printf("++++++++++++++ Select an option ++++++++++++++\n\n");
-                            Sleep(200);
-                            printf("1. Reload a product's stock count.\n");
-                            Sleep(200);
-                            printf("2. Modify a product's price.\n");
-                            Sleep(200);
-                            printf("3. Add a product to stock list.\n");
-                            Sleep(200);
-                            printf("4. Delete a product from stock list.\n");
-                            Sleep(200);
-                            printf("5. Clear all products' quantities in stock.\n");
-                            Sleep(200);
-                            printf("6. Set all products' quantities in stock.\n");
-                            Sleep(200);
-                            printf("Choice: ");
-
-                            int option;
-                            char input_choice[4];
-
-                            scanf("%s", &input_choice);
-                            if (strcmp(input_choice, "quit") == 0 || strcmp(input_choice, "QUIT") == 0
-                                || strcmp(input_choice, "Quit") == 0){
-                                    printf("Quitting Administrator Mode...\n");
-                                    Sleep(1000);
-                                    strcpy(input, input_choice);
-                                    validateInput = true;
-                                    enableAdmin = false;
-                                    break;
-                            }
-                            else {
-                                option = atoi(input_choice);
-                                if (option > 0 && option <= 6){
-                                    switch (option)
-                                    {
-                                        case 1:
-                                            reloadQuantity();
-                                            updateDatabase();
-                                            break;
-                                        
-                                        case 2:
-                                            setPrice();
-                                            updateDatabase();
-                                            break;
-
-                                        case 3:
-                                            
-                                            break;
-
-                                        case 4:
-                                            
-                                            break;
-
-                                        case 5:
-                                            clearAllQuantities();
-                                            updateDatabase();
-                                            break;
-                                            
-                                        case 6:
-                                            setAllQuantities();
-                                            updateDatabase();
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                           
-                            system("cls");
-                            }
-                        
-                        //break;
-                    }
-                    else {
-                        choice = atoi(input);
-                        choice--;   //take into account that list numbering starts at 1 on user interface
-                        orderInProgress = true;
-                    }
+                    enableAdmin = adminInterface(input, enableAdmin);
                     
-                }
-                
-                if (choice >= 0 && choice < PRODUCT_COUNT){
-
-                    //Get data from arrays into variables
-                    productID = PRODUCT_ID[choice];
-                    productName = PRODUCT_NAME[choice];
-                    productPrice = PRODUCT_PRICE[choice];
-                    productQuantity = PRODUCT_QUANTITY[choice];
-
-                    //temporary variable to store user's required quantity
-                    int quantity;                                   
-                    
-                    //Proceed with the trade if the product is in stock
-                    if (productQuantity > 0){
-
-                        //Ask the user only if a new session has started
-                        //retry is true when the user later inputs invalid data
-                        if (!retry){
-                            printf("You chose %s\n", productName);
-                            printf("Enter quantity: ");
-                            scanf("%i", &quantity);
-                        }
-                        
-                        //when user asks for more than the quantity in stock,
-                        //offer the maximum available amount of this product
-                        if (productQuantity < quantity && !doTransaction){
-                            printf("Sorry, not enough in stock. Do you want to take ");
-                            printf("%i of %s instead? (type: yes/no) ", productQuantity, productName);
-
-                            char* answer = (char*) malloc(sizeof(char) * 10);
-                            scanf("%s", answer);
-
-                            //If user answers with yes
-                            if (strcmp(answer, "yes") == 0 || strcmp(answer, "Yes") == 0 || strcmp(answer, "YES") == 0){
-                                quantity = productQuantity;
-                                doTransaction = true;
-                            }
-                            //If user answers with no
-                            else if(strcmp(answer, "no") == 0 || strcmp(answer, "No") == 0){
-                                orderInProgress = false;
-                            }
-                            else {
-                                printf("Invalid answer.\n");
-                                retry = true;               //raise the retry flag to force user to retry answering
-                            }
-                            free(answer);                   //free the memory allocated for answer
-                        }
-                        else {
-                            doTransaction = true;           //Allow for initiating the transaction
-                        }
-                        
-                        if (doTransaction){
-
-                            //Perform the transaction
-                            //function returns true if the transaction is successful
-                            purchaseSuccessful = startTransaction(quantity, choice, productPrice, purchaseSuccessful);
-                            if (purchaseSuccessful){
-                                doTransaction = false;
-                                retry = false;
-                            }
-                        }
-                    }
-                    else{
-                        printf("%s is out of stock. Returning to main menu.\n", productName);
-                        orderInProgress = false;
-                        retry = false;
-                        Sleep(3000);
-                    }
-                    
+                    //break;
                 }
                 else {
-                    if (!validateInput){
-                        //Invalid product ID is entered
-                        printf("%s\n", input);
-                        printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
-                        orderInProgress = false;
-                        retry = false;
-                        Sleep(3000);
-                    }
+                    choice = atoi(input);
+                    choice--;   //take into account that list numbering starts at 1 on user interface
+                    orderInProgress = true;
                 }
-
-                //Print info message upon successful transaction
-                if (purchaseSuccessful){
-
-                    printf("\n*************************************************************\n\n");
-                    printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
-                    printf("Thank you for using SmartVendo 3000!\n");
-                    printf("Returning to main menu.\n");
-
-                    //Update the stock file
-                    updateDatabase();
-                    Sleep(10000);
-                    orderInProgress = false;            //Stop the current sale session
-                    
-                }
+                
             }
             
+            if (choice >= 0 && choice < PRODUCT_COUNT){
+
+                //Get data from arrays into variables
+                productID = PRODUCT_ID[choice];
+                productName = PRODUCT_NAME[choice];
+                productPrice = PRODUCT_PRICE[choice];
+                productQuantity = PRODUCT_QUANTITY[choice];
+
+                //temporary variable to store user's required quantity
+                int quantity;                                   
+                
+                //Proceed with the trade if the product is in stock
+                if (productQuantity > 0){
+
+                    //Ask the user only if a new session has started
+                    //retry is true when the user later inputs invalid data
+                    if (!retry){
+                        printf("You chose %s\n", productName);
+                        printf("Enter quantity: ");
+                        scanf("%i", &quantity);
+                    }
+                    
+                    //when user asks for more than the quantity in stock,
+                    //offer the maximum available amount of this product
+                    if (productQuantity < quantity && !doTransaction){
+                        printf("Sorry, not enough in stock. Do you want to take ");
+                        printf("%i of %s instead? (type: yes/no) ", productQuantity, productName);
+
+                        char* answer = (char*) malloc(sizeof(char) * 10);
+                        scanf("%s", answer);
+
+                        //If user answers with yes
+                        if (strcmp(answer, "yes") == 0 || strcmp(answer, "Yes") == 0 || strcmp(answer, "YES") == 0){
+                            quantity = productQuantity;
+                            doTransaction = true;
+                        }
+                        //If user answers with no
+                        else if(strcmp(answer, "no") == 0 || strcmp(answer, "No") == 0){
+                            orderInProgress = false;
+                        }
+                        else {
+                            printf("Invalid answer.\n");
+                            retry = true;               //raise the retry flag to force user to retry answering
+                        }
+                        free(answer);                   //free the memory allocated for answer
+                    }
+                    else {
+                        doTransaction = true;           //Allow for initiating the transaction
+                    }
+                    
+                    if (doTransaction){
+
+                        //Perform the transaction
+                        //function returns true if the transaction is successful
+                        purchaseSuccessful = startTransaction(quantity, choice, productPrice, purchaseSuccessful);
+                        if (purchaseSuccessful){
+                            doTransaction = false;
+                            retry = false;
+                        }
+                    }
+                }
+                else{
+                    printf("%s is out of stock. Returning to main menu.\n", productName);
+                    orderInProgress = false;
+                    retry = false;
+                    Sleep(3000);
+                }
+                
+            }
+            else {
+                if (!validateInput){
+                    //Invalid product ID is entered
+                    printf("%s\n", input);
+                    printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
+                    orderInProgress = false;
+                    retry = false;
+                    Sleep(3000);
+                }
+            }
+
+            //Print info message upon successful transaction
+            if (purchaseSuccessful){
+
+                printf("\n*************************************************************\n\n");
+                printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
+                printf("Thank you for using SmartVendo 3000!\n");
+                printf("Returning to main menu.\n");
+
+                //Update the stock file
+                updateDatabase();
+                Sleep(10000);
+                orderInProgress = false;            //Stop the current sale session
+                
+            }
         }
-        while(true);
+        
+    }
+    while(true);
+    return 0;
+}
+
+bool adminInterface(char* input, bool enableAdmin){
+    while(enableAdmin){
+
+    printf("**********************************************\n");
+    printf("******************ADMIN MODE******************\n");
+    printf("**********************************************\n\n");
+    Sleep(200);
+    printf("++++++++++++++ Select an option ++++++++++++++\n\n");
+    Sleep(200);
+    printf("1. Reload a product's stock count.\n");
+    Sleep(200);
+    printf("2. Modify a product's price.\n");
+    Sleep(200);
+    printf("3. Add a product to stock list.\n");
+    Sleep(200);
+    printf("4. Delete a product from stock list.\n");
+    Sleep(200);
+    printf("5. Clear all products' quantities in stock.\n");
+    Sleep(200);
+    printf("6. Set all products' quantities in stock.\n");
+    Sleep(200);
+    printf("Choice: ");
+
+    int option;
+    char input_choice[4];
+
+    scanf("%s", &input_choice);
+    if (strcmp(input_choice, "quit") == 0 || strcmp(input_choice, "QUIT") == 0
+        || strcmp(input_choice, "Quit") == 0){
+            printf("Quitting Administrator Mode...\n");
+            Sleep(1000);
+            strcpy(input, input_choice);
+            validateInput = true;
+            return false;
+            break;
+    }
+    else {
+        option = atoi(input_choice);
+        if (option > 0 && option <= 6){
+            switch (option)
+            {
+                case 1:
+                    reloadQuantity();
+                    updateDatabase();
+                    break;
+                
+                case 2:
+                    setPrice();
+                    updateDatabase();
+                    break;
+
+                case 3:
+                    
+                    break;
+
+                case 4:
+                    
+                    break;
+
+                case 5:
+                    clearAllQuantities();
+                    updateDatabase();
+                    break;
+                    
+                case 6:
+                    setAllQuantities();
+                    updateDatabase();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
     
-    return 0;
+    system("cls");
+    }
 }
 
 //Set all quantities to value chosen by admin
