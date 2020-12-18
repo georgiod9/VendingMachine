@@ -31,23 +31,35 @@ int main(){
     //Allocate memory to product list array
     initializeNameArray();
 
+    //parseDatabase() will read the products along with
+    //their details from the stockfile into appropriate arrays
     if (parseDatabase()){
         printf("Error reading database.\n");
     }
-    PRODUCT_QUANTITY[9] = 10;
-    PRODUCT_PRICE[9] = 0.85;
 
+    /*
+    Modify stock file here, before writing to database
+    */
+
+   //copy changes, if any, to database (stock file)
     if (writeDatabase()){
         printf("Something went wrong.\n");
     }
-    printProductList();
 
-    printf("Choose your item: ");
-    char* input = (char*) malloc(sizeof(char)*20);
-    scanf("%s", input);
- 
-    printf("You chose %s\n", input);
+    //Print the available products
+    printProductList();
     
+    char* input = (char*) malloc(sizeof(char)*20);
+    //prompt user
+    do{
+        printf("Choose your item: ");
+        scanf("%s", input);
+       // if (searchItem(input)){
+            printf("You chose %s\n", input);
+       // }
+        
+    }
+    while(input != "admin");    
     
     return 0;
 }
