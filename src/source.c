@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <Windows.h>
+//#include <Windows.h>
+#include <unistd.h>
 #include <math.h>
 
 //Stock file - database path
-const char* DB_PATH = "C:\\Users\\Geo\\Desktop\\Vending Machine C program\\src\\stock.txt";
+const char* DB_PATH = "/Users/mac/Desktop/Projects/C/VendingMachine/src/stock.txt";
 const char* SECRET_KEY = "admin";
 const char* TABLE_HEADER = "Product Number     Name       Quantity      Price";
 const int   RACK_SIZE = 10;
@@ -14,9 +15,12 @@ const int   MAX_SIZE = 20;
 const int   MAX_WORD_SIZE = 20; //20 characters max per word
 const int   PRODUCT_COUNT = 20;
 const int   COLUMN_WIDTH = 30;  //width of table
+const float  DELAY_200 = 200000;  //200ms delay
+const float  DELAY_1000 = 1000000;
+const float   DELAY_3000 = 3000000;    //3 sec delay
 
 int PRODUCT_ID[20];
-char* PRODUCT_NAME[20];     //Product list array
+char* PRODUCT_NAME[20];         //Product list array
 int PRODUCT_QUANTITY[20];
 double PRODUCT_PRICE[20];
 
@@ -56,8 +60,8 @@ int main(){
         printf("Something went wrong.\n");
     }
     
-    char* input = (char*) malloc(sizeof(char)*20);
-    char* productName = (char*) malloc(sizeof(char)*MAX_WORD_SIZE);
+    char* input = (char*) malloc(sizeof(char) * 20);
+    char* productName = (char*) malloc(sizeof(char) * MAX_WORD_SIZE);
     int productID;
     int productQuantity;
     double productPrice;
@@ -75,7 +79,7 @@ int main(){
         if (!enableAdmin){
             //Only ask if user is not ordering
             if (!orderInProgress){
-                system("cls");
+                system("clear");
                 printProductList();
 
                 printf("Choose your item: ");
@@ -83,8 +87,8 @@ int main(){
 
                 //IMPLEMENT
                 if (strcmp(input, "admin") == 0){
-                    system("cls");
-                    Sleep(200);
+                    system("clear");
+                    usleep(DELAY_200);
                     enableAdmin = true;
 
                     enableAdmin = adminInterface(input, enableAdmin);
@@ -154,6 +158,7 @@ int main(){
                         //Perform the transaction
                         //function returns true if the transaction is successful
                         purchaseSuccessful = startTransaction(quantity, choice, productPrice, purchaseSuccessful);
+                        //usleep(DELAY_3000);
                         if (purchaseSuccessful){
                             doTransaction = false;
                             retry = false;
@@ -164,7 +169,7 @@ int main(){
                     printf("%s is out of stock. Returning to main menu.\n", productName);
                     orderInProgress = false;
                     retry = false;
-                    Sleep(3000);
+                    usleep(DELAY_3000);
                 }
                 
             }
@@ -175,21 +180,21 @@ int main(){
                     printf("Please enter a product ID from 1 to %i\n", PRODUCT_COUNT);
                     orderInProgress = false;
                     retry = false;
-                    Sleep(3000);
+                    usleep(DELAY_3000);
                 }
             }
 
             //Print info message upon successful transaction
             if (purchaseSuccessful){
 
-                printf("\n*************************************************************\n\n");
+                printf("\n\n*************************************************************\n\n");
                 printf("Please take your %s from the slot below.\n", PRODUCT_NAME[choice]);
                 printf("Thank you for using SmartVendo 3000!\n");
                 printf("Returning to main menu.\n");
 
                 //Update the stock file
                 updateDatabase();
-                Sleep(10000);
+                usleep(DELAY_3000);
                 orderInProgress = false;            //Stop the current sale session
                 
             }
@@ -197,6 +202,11 @@ int main(){
         
     }
     while(true);
+
+    //free memory
+    free(input);
+    free(productName);
+    free(PRODUCT_NAME);
     return 0;
 }
 
@@ -206,21 +216,21 @@ bool adminInterface(char* input, bool enableAdmin){
     printf("**********************************************\n");
     printf("******************ADMIN MODE******************\n");
     printf("**********************************************\n\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("++++++++++++++ Select an option ++++++++++++++\n\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("1. Reload a product's stock count.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("2. Modify a product's price.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("3. Add a product to stock list.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("4. Delete a product from stock list.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("5. Clear all products' quantities in stock.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("6. Set all products' quantities in stock.\n");
-    Sleep(200);
+    usleep(DELAY_200);
     printf("Choice: ");
 
     int option;
@@ -230,7 +240,7 @@ bool adminInterface(char* input, bool enableAdmin){
     if (strcmp(input_choice, "quit") == 0 || strcmp(input_choice, "QUIT") == 0
         || strcmp(input_choice, "Quit") == 0){
             printf("Quitting Administrator Mode...\n");
-            Sleep(1000);
+            usleep(DELAY_1000);
             strcpy(input, input_choice);
             validateInput = true;
             return false;
@@ -274,7 +284,7 @@ bool adminInterface(char* input, bool enableAdmin){
         }
     }
     
-    system("cls");
+    system("clear");
     }
 }
 

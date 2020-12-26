@@ -1,20 +1,20 @@
 0/Yoghurt/10/3.00/
-1/Cheetos/0/1.25/
-2/Doritos/9/7.00/
-3/Snickers/5/1.50/
-4/Hershey's/8/2.50/
-5/Juice/8/0.75/
+1/Cheetos/7/1.25/
+2/Doritos/10/7.00/
+3/Snickers/10/1.50/
+4/Hershey's/10/2.50/
+5/Juice/10/0.75/
 6/Water/10/0.25/
 7/Marlboro Smokes/10/4.50/
 8/Lighter/10/0.10/
 9/Nuts/10/0.85/
 10/Beer/10/0.35/
 11/Chocolate/10/1.20/
-12/Pringles/8/3.50/
+12/Pringles/10/3.50/
 13/Red Bull/10/2.50/
 14/Milkshake/10/1.00/
 15/Oreo/10/0.50/
 16/KitKat/10/0.50/
 17/Maltesers/10/0.50/
-18/Jelly Beans/9/0.30/
-19/Tequila Shot/8/1.50/
+18/Jelly Beans/10/0.30/
+19/Tequila Shot/10/1.50/
