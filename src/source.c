@@ -19,10 +19,10 @@ const float  DELAY_200 = 200000;  //200ms delay
 const float  DELAY_1000 = 1000000;
 const float   DELAY_3000 = 3000000;    //3 sec delay
 
-int PRODUCT_ID[20];
-char* PRODUCT_NAME[20];         //Product list array
-int PRODUCT_QUANTITY[20];
-double PRODUCT_PRICE[20];
+int PRODUCT_ID[PRODUCT_COUNT];
+char* PRODUCT_NAME[PRODUCT_COUNT];         //Product list array
+int PRODUCT_QUANTITY[PRODUCT_COUNT];
+double PRODUCT_PRICE[PRODUCT_COUNT];
 
 bool validateInput = false;
 
@@ -76,7 +76,7 @@ int main(){
     //prompt user
     do {
         
-        if (!enableAdmin){
+        //if (!enableAdmin){
             //Only ask if user is not ordering
             if (!orderInProgress){
                 system("clear");
@@ -92,17 +92,33 @@ int main(){
                     enableAdmin = true;
 
                     enableAdmin = adminInterface(input, enableAdmin);
+                    while(enableAdmin){
+                        enableAdmin = adminInterface(input, enableAdmin);
+                    }
+                    choice = -1;    //avoid entering purchase mode in the below code
                     
                     //break;
                 }
                 else {
                     choice = atoi(input);
+                    while (choice < 1 || choice > PRODUCT_COUNT){
+                        printf("\nEnter product ID from 1 till %i.\n", PRODUCT_COUNT);
+                        usleep(DELAY_3000);
+                        system("cls");
+                        printProductList();
+
+                        printf("Choose your item: ");
+                        scanf("%s", input);
+                        choice = atoi(input);
+                    }
+                    
                     choice--;   //take into account that list numbering starts at 1 on user interface
                     orderInProgress = true;
                 }
                 
             }
             
+            //enter purchase mode
             if (choice >= 0 && choice < PRODUCT_COUNT){
 
                 //Get data from arrays into variables
@@ -198,7 +214,7 @@ int main(){
                 orderInProgress = false;            //Stop the current sale session
                 
             }
-        }
+        //}
         
     }
     while(true);
@@ -211,7 +227,7 @@ int main(){
 }
 
 bool adminInterface(char* input, bool enableAdmin){
-    while(enableAdmin){
+    //while(enableAdmin){
 
     printf("**********************************************\n");
     printf("******************ADMIN MODE******************\n");
@@ -231,6 +247,8 @@ bool adminInterface(char* input, bool enableAdmin){
     usleep(DELAY_200);
     printf("6. Set all products' quantities in stock.\n");
     usleep(DELAY_200);
+    printf("\nType \"quit\" to exit administrator mode.\n");
+    usleep(DELAY_200);
     printf("Choice: ");
 
     int option;
@@ -244,7 +262,7 @@ bool adminInterface(char* input, bool enableAdmin){
             strcpy(input, input_choice);
             validateInput = true;
             return false;
-            break;
+            //break;
     }
     else {
         option = atoi(input_choice);
@@ -281,11 +299,13 @@ bool adminInterface(char* input, bool enableAdmin){
                 default:
                     break;
             }
+            system("clear");
+            return true;
         }
     }
     
-    system("clear");
-    }
+    
+    //}
 }
 
 //Set all quantities to value chosen by admin
@@ -322,7 +342,7 @@ void setPrice(){
     double newPrice = -1;
 
     while(newPrice <= 0){
-        printf("Enter new price for %s: ", PRODUCT_NAME[ID]);
+        printf("Enter new price for %s: ", PRODUCT_NAME[ID - 1]); //ID-1 to take into account counting from 1
         scanf("%lf", &newPrice);
 
         if (newPrice <= 0){
@@ -330,7 +350,7 @@ void setPrice(){
         }
     }
 
-    PRODUCT_PRICE[ID] = newPrice;
+    PRODUCT_PRICE[ID - 1] = newPrice;
 }
 
 //Set new quantity to any product
@@ -339,13 +359,13 @@ void reloadQuantity(){
                                 
     int ID;
     scanf("%i", &ID);
-    printf("Enter new quantity for %s: ", PRODUCT_NAME[ID]);
+    printf("Enter new quantity for %s: ", PRODUCT_NAME[ID - 1]);
     
     int Q;
     scanf("%i", &Q);
-    printf("%s new quantity set to %i.\n", PRODUCT_NAME[ID], Q);
+    printf("%s new quantity set to %i.\n", PRODUCT_NAME[ID - 1], Q);
 
-    PRODUCT_QUANTITY[ID] = Q;
+    PRODUCT_QUANTITY[ID - 1] = Q;
 }
 
 //Call this function when the user should pay
